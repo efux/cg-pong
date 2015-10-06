@@ -3,9 +3,20 @@
     <head>
         <title>CG - Pong</title>
         <script  type="text/javascript" src="webgl-debug.js"></script >
+        <script type="text/javascript" src="lib/gl-matrix-min.js"></script>
+        <script type="text/javascript" src="geometrics.js"></script>
         <script type="text/javascript" src="pong.js"></script>
+        <style type="text/css">
+.score {
+    float:right;
+    font: 60px Arial non-serif;
+}
+        </style>
     </head>
     <body onload="startup()">
         <canvas  id="gameCanvas" width="800" height="600"></canvas>
+        <div id="scoreLeft" class="score">5</div>
+        <div class="score">:</div>
+        <div id="scoreRight" class="score">5</div>
     </body>
 </html>
