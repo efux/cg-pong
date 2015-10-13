@@ -12,7 +12,7 @@ var score = [0,0];
 var elapsedTime = 0;
 var paddleLeft = new Rectangle(10, 10, 15, 100);
 var paddleRight = new Rectangle(800-10-15, 50, 15, 100);
-var ball = new Rectangle(50, 100, 10, 10);
+var ball = new Ball(50, 100, 5, 16);
 var middleLine = new Rectangle(399, 0, 2, 600);
 var movementMatrice = [8, 3];
 
@@ -129,13 +129,13 @@ function draw() {
 
     counter = 0;
     elements.forEach(function (e) {
-        gl.drawArrays(gl.TRIANGLE_FAN,counter,e.getPointsCount());
+        gl.drawArrays(e.getDrawStyle(),counter,e.getPointsCount());
         counter = counter + e.getPointsCount();
     });
 }
 
 function resetBall() {
-    ball = new Rectangle(400, 300, 10, 10);
+    ball = new Ball(400, 300, 5, 16);
     movementMatrice = [Math.random()*100 % 20 - 10, Math.random()*100 % 20 - 10];
 }
 
