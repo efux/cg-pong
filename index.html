@@ -2,6 +2,29 @@
 <html>
     <head>
         <title>CG - Pong</title>
+        <script id="shader-fs" type="x-shader/x-fragment">
+precision  mediump  float;
+varying vec4 vColor;
+uniform vec4 uColor;
+void  main() {
+    gl_FragColor = vColor;
+}
+        </script>
+        <script id="shader-vs" type="x-shader/x-vertex">
+attribute  vec2  aVertexPosition;
+attribute  vec4 aVertexColor;
+uniform vec2 uResolution;
+varying vec4 vColor;
+void  main() {
+     vec2 vertexPosition = aVertexPosition * vec2(1,-1) + (uResolution * vec2(0, 1));
+     vec2 zeroToOne = vertexPosition / uResolution;
+     vec2 zeroToTwo = zeroToOne * 2.0;
+     vec2 clipSpace = zeroToTwo - 1.0;
+     vec4  position = vec4(clipSpace, 0.0, 1.0);
+     gl_Position = position;
+     vColor = aVertexColor;
+}
+        </script>
         <script  type="text/javascript" src="webgl-debug.js"></script >
         <script type="text/javascript" src="lib/gl-matrix-min.js"></script>
         <script type="text/javascript" src="geometrics.js"></script>

@@ -16,27 +16,8 @@ var ball = new Rectangle(50, 100, 10, 10);
 var middleLine = new Rectangle(399, 0, 2, 600);
 var movementMatrice = [8, 3];
 
-var VSHADER_SOURCE = 
-"attribute  vec2  aVertexPosition;" +
-"attribute  vec4 aVertexColor;" +
-"uniform vec2 uResolution;" +
-"varying vec4 vColor;" +
-"void  main() {" +
-"     vec2 vertexPosition = aVertexPosition * vec2(1,-1) + (uResolution * vec2(0, 1));" +
-"     vec2 zeroToOne = vertexPosition / uResolution;" + 
-"     vec2 zeroToTwo = zeroToOne * 2.0;" + 
-"     vec2 clipSpace = zeroToTwo - 1.0;" +
-"     vec4  position = vec4(clipSpace, 0.0, 1.0);" +
-"     gl_Position = position;" +
-"     vColor = aVertexColor;" +
-"}";
-var  FSHADER_SOURCE =
-"precision  mediump  float;"+
-"varying vec4 vColor;" +
-"uniform vec4 uColor;"+
-"void  main() {"+
-"      gl_FragColor = vColor;"+
-"}";
+var VSHADER_SOURCE; 
+var FSHADER_SOURCE;
 
 var color = 0.0;
 
@@ -44,6 +25,8 @@ function  startup () {
     canvas = document.getElementById("gameCanvas");
     scoreLeft = document.getElementById("scoreLeft");
     scoreRight = document.getElementById("scoreRight");
+    VSHADER_SOURCE = document.getElementById("shader-vs").text;
+    FSHADER_SOURCE = document.getElementById("shader-fs").text;
     initGL ();
     initShaders();
     setupAttributes();
@@ -63,21 +46,37 @@ function addScore(matrice) {
     score[0] += matrice[0];
     score[1] += matrice[1];
     updateScore();
+    resetBall();
 } 
 
 function setupInput() {
     document.addEventListener('keydown', function(event) {
         if(event.keyCode == 38) {
-            paddleRight.moveUp();
+            paddleRight.moveUp(true);
         }
         else if(event.keyCode == 40) {
-            paddleRight.moveDown();
+            paddleRight.moveDown(true);
         }
         if(event.keyCode == 87) {
-            paddleLeft.moveUp();
+            paddleLeft.moveUp(true);
         }
         else if(event.keyCode == 83) {
-            paddleLeft.moveDown();
+            paddleLeft.moveDown(true);
+        }
+    });
+    
+    document.addEventListener('keyup', function(event) {
+        if(event.keyCode == 38) {
+            paddleRight.moveUp(false);
+        }
+        else if(event.keyCode == 40) {
+            paddleRight.moveDown(false);
+        }
+        if(event.keyCode == 87) {
+            paddleLeft.moveUp(false);
+        }
+        else if(event.keyCode == 83) {
+            paddleLeft.moveDown(false);
         }
     });
 }
@@ -135,11 +134,29 @@ function draw() {
     });
 }
 
+function resetBall() {
+    ball = new Rectangle(400, 300, 10, 10);
+    movementMatrice = [Math.random()*100 % 20 - 10, Math.random()*100 % 20 - 10];
+}
+
 function mainLoop(timeStamp) {
     if(timeStamp-elapsedTime > 10) {
         color = Math.random();
         elapsedTime = timeStamp;
-        if(ball.getPositionOfMiddle()[1] > canvas.height-30 || ball.getPositionOfMiddle()[1] < 30) {
+        checkBallPosition(); 
+        paddleLeft.update();
+        paddleRight.update();
+        movementMatrice[0] = movementMatrice[0] + movementMatrice[0] * 0.0001;
+        movementMatrice[1] = movementMatrice[1] + movementMatrice[1] * 0.0001;
+        ball.move(movementMatrice);
+    }
+    setupBuffers();
+    draw();
+    window.requestAnimationFrame(mainLoop);
+}
+
+function checkBallPosition() {
+    if(ball.getPositionOfMiddle()[1] > canvas.height-30 || ball.getPositionOfMiddle()[1] < 30) {
             movementMatrice[1] *= -1;
         }
         if(ball.getPositionOfMiddle()[0] > canvas.width-30) {
@@ -155,11 +172,6 @@ function mainLoop(timeStamp) {
         if(ball.getPositionOfMiddle()[0] > canvas.width-30 || ball.getPositionOfMiddle()[0] < 30) {
             movementMatrice[0] *= -1;
         }
-        ball.move(movementMatrice);
-    }
-    setupBuffers();
-    draw();
-    window.requestAnimationFrame(mainLoop);
 }
 
 function initShaders() {

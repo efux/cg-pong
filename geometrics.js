@@ -29,6 +29,9 @@ function Rectangle(x, y, width, height) {
                     new Point(x+width, y+height),
                     new Point(x, y+height)];
     this.height = height;
+    this.moveDownState = false;
+    this.moveUpState = false;
+    this.verticalSpeed = 5;
 
     this.getVertices = function() {
         var retVal = [];
@@ -69,15 +72,25 @@ function Rectangle(x, y, width, height) {
         return false;
     }
 
-    this.moveDown = function() {
-        this.move([0, 20]);
+    this.moveDown = function(b) {
+        this.moveDownState = b;
     }
 
-    this.moveUp = function() {
-        this.move([0, -20]);
+    this.moveUp = function(b) {
+        this.moveUpState = b;
     }
 
     this.getPointsCount = function() {
         return this.points.length;
+    }
+
+    this.update = function() {
+        if(this.moveUpState) {
+            this.move([0, -1 * this.verticalSpeed]);
+        } else {
+            if(this.moveDownState) {
+                this.move([0, this.verticalSpeed]);
+            }
+        }
     }
 }
